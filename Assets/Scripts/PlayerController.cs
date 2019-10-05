@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     public float maxSpeed = 10f;
 
     private Rigidbody rb;
+    private bool actionPressed = false;
     private float x;
     private float z;
     Vector3 moveVector;
@@ -44,6 +45,8 @@ public class PlayerController : MonoBehaviour
         moveVector.x = x;
         moveVector.y = 0f;
         moveVector.z = z;
+        if (moveVector.magnitude >= 1f)
+            moveVector = moveVector.normalized;
         rb.AddForce(moveVector * moveSpeed);
         // Consume
         x = z = 0f;

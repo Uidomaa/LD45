@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public Transform playerMesh;
+    [Header("MOVEMENT")]
     public float moveSpeed = 10f;
     public float maxSpeed = 10f;
+    [Header("MAGIC")]
+    public Transform wandTip;
+    public Transform magicPrefab;
 
     private Rigidbody rb;
-    private bool actionPressed = false;
     private float x;
     private float z;
     Vector3 moveVector;
@@ -23,8 +25,11 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //Catch inputs
         x += Input.GetAxis("Horizontal");
         z += Input.GetAxis("Vertical");
+        if (Input.GetButtonDown("Jump"))
+            CastSpell();
         FaceMoveDirection();
     }
 
@@ -37,7 +42,11 @@ public class PlayerController : MonoBehaviour
     {
         if (rb.velocity.magnitude > maxSpeed)
             rb.velocity = rb.velocity.normalized * maxSpeed;
+    }
 
+    private void CastSpell ()
+    {
+        Instantiate(magicPrefab, wandTip.position, transform.rotation);
     }
 
     private void Move()

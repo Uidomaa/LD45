@@ -5,6 +5,7 @@ using UnityEngine;
 public class SpellController : MonoBehaviour
 {
     public float moveSpeed = 10f;
+    public ParticleSystem explosionPS;
 
     private ParticleSystem[] pses;
     private Rigidbody rb;
@@ -23,6 +24,7 @@ public class SpellController : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        explosionPS.Play();
         if (collision.gameObject.CompareTag("Ghost"))
         {
             GameManager.instance.HitGhost();

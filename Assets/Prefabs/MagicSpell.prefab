@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1223186622834251654}
   - component: {fileID: 8740310781774677265}
   - component: {fileID: 6023585077651769572}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: MagicBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 7710992671661410235}
   - component: {fileID: 4264644120539261449}
   - component: {fileID: 8564382590917801192}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: ExplosionPS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4918,7 +4918,7 @@ GameObject:
   - component: {fileID: 5781894154369369887}
   - component: {fileID: 5781894154369369881}
   - component: {fileID: 5781894154369369880}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: TrailPS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9690,7 +9690,7 @@ GameObject:
   - component: {fileID: 5952592930382142669}
   - component: {fileID: 705605156549634234}
   - component: {fileID: 672858227619117422}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: MagicSpell
   m_TagString: Untagged
   m_Icon: {fileID: 0}

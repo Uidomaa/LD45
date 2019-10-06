@@ -16,7 +16,11 @@ public class SpellController : MonoBehaviour
         pses = GetComponentsInChildren<ParticleSystem>(true);
     }
 
-    // Update is called once per frame
+    private void Start()
+    {
+        AudioManager.instance.PlayCastSpell();
+    }
+
     void FixedUpdate()
     {
         rb.velocity = transform.forward * Time.fixedDeltaTime * moveSpeed;
@@ -24,10 +28,18 @@ public class SpellController : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        AudioManager.instance.PlaySpellMiss();
         explosionPS.Play();
         if (collision.gameObject.CompareTag("Ghost"))
         {
-            GameManager.instance.HitGhost();
+            AudioManager.instance.PlaySpellHit();
+            if (collision.gameObject.GetComponent<GhostController>())
+            {
+                if (collision.gameObject.GetComponent<GhostController>().HitByPlayer()) { 
+                    GameManager.instance.DefeatedGhost();}
+            }
+            else
+                Debug.LogError("Ghost missing GhostController!");
         }
         foreach (var ps in pses)
         {
@@ -35,6 +47,7 @@ public class SpellController : MonoBehaviour
             psMain.loop = false;
             ps.transform.SetParent(null);
         }
+
         Destroy(gameObject);
     }
 }

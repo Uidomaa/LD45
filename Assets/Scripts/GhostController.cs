@@ -5,6 +5,7 @@ using UnityEngine.AI;
 
 public class GhostController : MonoBehaviour
 {
+    public int hp = 1;
     public Transform goal;
 
     private NavMeshAgent agent;
@@ -29,5 +30,19 @@ public class GhostController : MonoBehaviour
             agent.destination = goal.position;
             yield return new WaitForSeconds(1f);
         }
+    }
+
+    public bool HitByPlayer ()
+    {
+        hp--;
+        if (hp < 1)
+            return true;
+        else
+            return false;
+    }
+
+    public void HitPlayer ()
+    {
+        //TODO When player is hit by ghost
     }
 }

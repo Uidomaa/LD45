@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public int hp = 1;
     [Header("MOVEMENT")]
     public float moveSpeed = 10f;
     public float maxSpeed = 10f;
@@ -65,5 +66,22 @@ public class PlayerController : MonoBehaviour
     {
         if (rb.velocity.sqrMagnitude > 0.1f)
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(rb.velocity), Time.deltaTime * 10f);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (hp > 0 && collision.gameObject.CompareTag("Ghost"))
+        {
+            if (collision.gameObject.GetComponent<GhostController>())
+            {
+                collision.gameObject.GetComponent<GhostController>().HitPlayer();
+            }
+            hp--;
+            Debug.Log("Touched by ghost! " + hp + " hp left!");
+            if (hp > 0)
+                AudioManager.instance.PlayGhostHitPlayer();
+            else
+                AudioManager.instance.PlayPlayerKilled();
+        }
     }
 }

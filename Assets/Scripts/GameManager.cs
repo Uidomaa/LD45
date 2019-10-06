@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
         
     }
 
-    public void HitGhost ()
+    public void DefeatedGhost ()
     {
         Debug.Log("HIT!");
     }

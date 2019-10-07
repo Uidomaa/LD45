@@ -11,11 +11,13 @@ public class PlayerController : MonoBehaviour
     [Header("MAGIC")]
     public Transform wandTip;
     public Transform magicPrefab;
+    public Animator playerAnim;
 
     private Rigidbody rb;
     private float x;
     private float z;
-    Vector3 moveVector;
+    private Vector3 moveVector;
+    private bool canShoot = true;
 
     // Start is called before the first frame update
     void Start()
@@ -29,7 +31,7 @@ public class PlayerController : MonoBehaviour
         //Catch inputs
         x += Input.GetAxis("Horizontal");
         z += Input.GetAxis("Vertical");
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump") && canShoot)
             CastSpell();
         FaceMoveDirection();
     }
@@ -47,7 +49,16 @@ public class PlayerController : MonoBehaviour
 
     private void CastSpell ()
     {
+        playerAnim.SetTrigger("Shoot");
         Instantiate(magicPrefab, wandTip.position, transform.rotation);
+        StartCoroutine(ShootCooldown());
+    }
+
+    private IEnumerator ShootCooldown ()
+    {
+        canShoot = false;
+        yield return new WaitForSeconds(1f);
+        canShoot = true;
     }
 
     private void Move()

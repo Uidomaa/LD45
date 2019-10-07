@@ -9,10 +9,11 @@ public class StoryManager : MonoBehaviour
     public static StoryManager instance;
     public static int dialogueIndex = -1;
 
-    [SerializeField]
-    private GameObject dialogueCanvas;
-    [SerializeField]
-    private TextMeshProUGUI dialogueTMP;
+    public GameObject dialogueCanvas;
+    public TextMeshProUGUI dialogueTMP;
+    public GameObject tinyRoom;
+
+    public bool shouldNotAdvance = true;
 
     private void Awake()
     {
@@ -39,6 +40,8 @@ public class StoryManager : MonoBehaviour
 
     public void NextDialogue ()
     {
+        if (shouldNotAdvance)
+            return;
         dialogueIndex++;
         dialogueCanvas.SetActive(true);
         dialogueTMP.text = "";
@@ -56,11 +59,28 @@ public class StoryManager : MonoBehaviour
             case 3:
                 dialogueTMP.DOText("...?", 1f).SetEase(Ease.InSine);
                 FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(1);// Zoom into crystal ball
+                StartCoroutine(ShowTinyRoom());
+                break;
+            case 4:
+                dialogueTMP.DOText("Of course!", 0.5f).SetEase(Ease.InSine);
+                break;
+            case 5:
+                dialogueTMP.DOText("I just need to collect 9 cat souls!", 1f).SetEase(Ease.InSine);
                 break;
             default:
                 dialogueCanvas.SetActive(false);//Close dialogue box
+                GameManager.instance.LoadScene(1);//Load first level
+                GameManager.instance.SetGameState(GameManager.GameState.gameAlive);
                 break;
         }
+    }
+
+    private IEnumerator ShowTinyRoom ()
+    {
+        shouldNotAdvance = true;
+        tinyRoom.SetActive(true);
+        yield return tinyRoom.transform.DOScale(0f, 1f).From().SetEase(Ease.OutBounce).WaitForCompletion();
+        shouldNotAdvance = false;
     }
 
     public void CloseDialogue ()

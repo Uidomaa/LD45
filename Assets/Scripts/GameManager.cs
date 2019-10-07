@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using DG.Tweening;
 
 public class GameManager : MonoBehaviour
@@ -10,10 +11,11 @@ public class GameManager : MonoBehaviour
 
     [SerializeField]
     private Image screenFader;
+    public Image titleImage;
 
     private int numCats = 0;
 
-    private GameState curGameState = GameState.home;
+    private GameState curGameState = GameState.menu;
     public enum GameState
     {
         menu,
@@ -37,6 +39,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         FadeIn();
+        titleImage.gameObject.SetActive(true);
     }
 
     // Update is called once per frame
@@ -45,6 +48,12 @@ public class GameManager : MonoBehaviour
         switch (curGameState)
         {
             case GameState.menu:
+                //TODO Fade title image
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    titleImage.DOFade(0f, 2f).SetEase(Ease.InOutSine).OnComplete( () => { StoryManager.instance.shouldNotAdvance = false; });
+                    SetGameState(GameState.home);
+                }
                 break;
             case GameState.home:
                 UpdateIntroDialogue();
@@ -67,6 +76,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private IEnumerator FadedSceneLoad (int sceneToLoad)
+    {
+        FadeOut(3f);
+        yield return new WaitForSeconds(3f);
+        SceneManager.LoadScene(sceneToLoad);
+    }
+
     private void FadeIn (float fadeTime = 3f)
     {
         screenFader.color = Color.black;
@@ -78,9 +94,19 @@ public class GameManager : MonoBehaviour
         screenFader.DOFade(1f, fadeTime).SetEase(Ease.InOutSine);
     }
 
+    public void LoadScene (int sceneToLoad)
+    {
+        StartCoroutine(FadedSceneLoad(sceneToLoad));
+    }
+
     public GameState GetGameState ()
     {
         return curGameState;
+    }
+
+    public void SetGameState(GameState newGameState)
+    {
+        curGameState = newGameState;
     }
 
     public void DefeatedGhost ()

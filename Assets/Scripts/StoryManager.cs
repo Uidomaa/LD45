@@ -35,6 +35,7 @@ public class StoryManager : MonoBehaviour
         dialogueCanvas.SetActive(false);
         continueText.SetActive(false);
         titleContinue.SetActive(false);
+        tinyRoom.SetActive(false);
     }
 
     // Update is called once per frame
@@ -55,25 +56,34 @@ public class StoryManager : MonoBehaviour
         switch (dialogueIndex)
         {
             case 0:
-                dialogueTMP.DOText("Finally moved in to my own house!", 1f).SetEase(Ease.InSine);
+                dialogueTMP.DOText("I have finally moved in to my own place!", 1f).SetEase(Ease.InSine);
                 break;
             case 1:
                 dialogueTMP.DOText("The first order of business is to get a kitty!", 1f).SetEase(Ease.InSine);
                 break;
             case 2:
-                dialogueTMP.DOText("Now...how do I get one...?", 2f).SetEase(Ease.InSine);
-                cooldownDuration = 2.5f;
+                dialogueTMP.DOText("Now...how do I get one...?", 1f).SetEase(Ease.InSine);
                 break;
             case 3:
-                dialogueTMP.DOText("...!", 1f).SetEase(Ease.InSine);
-                FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(2);// Zoom into crystal ball
-                StartCoroutine(ShowTinyRoom());
-                break;
-            case 4:
                 dialogueTMP.DOText("Of course!", 0.5f).SetEase(Ease.InSine);
                 break;
-            case 5:
+            case 4:
                 dialogueTMP.DOText("I just need to collect 9 cat souls!", 1f).SetEase(Ease.InSine);
+                break;
+            case 5:
+                dialogueTMP.DOText("But where to find them?", 1f).SetEase(Ease.InSine);
+                break;
+            case 6:
+                dialogueTMP.DOText("...!", 1f).SetEase(Ease.InSine);
+                FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(2);// Zoom into crystal ball
+                ShowTinyRoom();
+                cooldownDuration = 2.5f;
+                break;
+            case 7:
+                dialogueTMP.DOText("Ah! Thank you, Crystal Ball.", 1f).SetEase(Ease.InSine);
+                break;
+            case 8:
+                dialogueTMP.DOText("An abandoned house would be purr-fect! Teehee!", 1f).SetEase(Ease.InSine);
                 break;
             default:
                 dialogueCanvas.SetActive(false);//Close dialogue box
@@ -84,12 +94,10 @@ public class StoryManager : MonoBehaviour
         StartCoroutine(StoryCooldown(cooldownDuration));
     }
 
-    private IEnumerator ShowTinyRoom ()
+    private void ShowTinyRoom ()
     {
-        shouldNotAdvance = true;
         tinyRoom.SetActive(true);
-        yield return tinyRoom.transform.DOScale(0f, 1f).From().SetEase(Ease.OutBounce).WaitForCompletion();
-        shouldNotAdvance = false;
+        tinyRoom.transform.DOScale(0f, 1f).From().SetEase(Ease.OutBounce);
     }
 
     private IEnumerator StoryCooldown (float cooldownDuration = 1f)

@@ -17,12 +17,6 @@ public class GhostController : MonoBehaviour
         StartCoroutine(UpdateTarget());
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     private IEnumerator UpdateTarget ()
     {
         while (true)

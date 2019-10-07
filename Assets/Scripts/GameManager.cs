@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
 
     private int numCats = 0;
 
-    private GameState curGameState = GameState.menu;
+    private GameState curGameState = GameState.intro;
     public enum GameState
     {
         intro,
@@ -39,8 +39,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        FadeIn(10);
-        titleImage.gameObject.SetActive(true);
+        StartCoroutine(DoIntroTimeout());
     }
 
     // Update is called once per frame
@@ -48,17 +47,20 @@ public class GameManager : MonoBehaviour
     {
         switch (curGameState)
         {
+            case GameState.intro:
+                break;
             case GameState.menu:
                 //TODO Fade title image
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    titleImage.DOFade(0f, 2f).SetEase(Ease.InOutSine).OnComplete( () => 
-                    {
-                        StoryManager.instance.shouldNotAdvance = false;
-                        StoryManager.instance.NextDialogue();
-                    });
+                    titleImage.DOFade(0f, 2f).SetEase(Ease.InOutSine).OnComplete(() =>
+                   {
+                       StoryManager.instance.shouldNotAdvance = false;
+                       StoryManager.instance.NextDialogue();
+                   });
                     FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(1);// Show witch
                     SetGameState(GameState.home);
+                    StoryManager.instance.titleContinue.SetActive(false);
                 }
                 break;
             case GameState.home:
@@ -74,7 +76,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    //private IEnumerator introTimeout
+    private IEnumerator DoIntroTimeout ()
+    {
+        FadeIn(10);
+        titleImage.gameObject.SetActive(true);
+        yield return new WaitForSeconds(10f);
+        StoryManager.instance.titleContinue.SetActive(true);
+        SetGameState(GameState.menu);
+    }
+
     private void UpdateIntroDialogue ()
     {
         if (Input.GetKeyDown(KeyCode.Space))

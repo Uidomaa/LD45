@@ -50,7 +50,6 @@ public class PlayerController : MonoBehaviour
     private void CastSpell ()
     {
         playerAnim.SetTrigger("Shoot");
-        Instantiate(magicPrefab, wandTip.position, transform.rotation);
         StartCoroutine(ShootCooldown());
     }
 
@@ -77,6 +76,14 @@ public class PlayerController : MonoBehaviour
     {
         if (rb.velocity.sqrMagnitude > 0.1f)
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(rb.velocity), Time.deltaTime * 10f);
+    }
+
+    /// <summary>
+    /// Called by animation trigger
+    /// </summary>
+    public void CastMagic ()
+    {
+        Instantiate(magicPrefab, wandTip.position, transform.rotation);
     }
 
     private void OnCollisionEnter(Collision collision)

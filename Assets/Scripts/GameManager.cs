@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     private GameState curGameState = GameState.menu;
     public enum GameState
     {
+        intro,
         menu,
         home,
         gameAlive,
@@ -38,7 +39,7 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        FadeIn();
+        FadeIn(10);
         titleImage.gameObject.SetActive(true);
     }
 
@@ -51,7 +52,12 @@ public class GameManager : MonoBehaviour
                 //TODO Fade title image
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
-                    titleImage.DOFade(0f, 2f).SetEase(Ease.InOutSine).OnComplete( () => { StoryManager.instance.shouldNotAdvance = false; });
+                    titleImage.DOFade(0f, 2f).SetEase(Ease.InOutSine).OnComplete( () => 
+                    {
+                        StoryManager.instance.shouldNotAdvance = false;
+                        StoryManager.instance.NextDialogue();
+                    });
+                    FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(1);// Show witch
                     SetGameState(GameState.home);
                 }
                 break;
@@ -68,6 +74,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    //private IEnumerator introTimeout
     private void UpdateIntroDialogue ()
     {
         if (Input.GetKeyDown(KeyCode.Space))

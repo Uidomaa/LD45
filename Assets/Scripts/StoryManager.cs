@@ -38,12 +38,6 @@ public class StoryManager : MonoBehaviour
         tinyRoom.SetActive(false);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void NextIntroDialogue ()
     {
         if (shouldNotAdvance)
@@ -56,7 +50,7 @@ public class StoryManager : MonoBehaviour
         switch (dialogueIndex)
         {
             case 0:
-                dialogueTMP.DOText("I have finally moved in to my own place!", 1f).SetEase(Ease.InSine);
+                dialogueTMP.DOText("Finally moved into my own place!", 1f).SetEase(Ease.InSine);
                 break;
             case 1:
                 dialogueTMP.DOText("The first order of business is to get a kitty!", 1f).SetEase(Ease.InSine);

@@ -97,9 +97,14 @@ public class PlayerController : MonoBehaviour
             hp--;
             Debug.Log("Touched by ghost! " + hp + " hp left!");
             if (hp > 0)
+            {
                 AudioManager.instance.PlayGhostHitPlayer();
+            }
             else
-                AudioManager.instance.PlayPlayerKilled();
+            {
+                GameManager.instance.PlayerDied();
+                
+            }
         }
     }
 }

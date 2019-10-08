@@ -44,7 +44,7 @@ public class StoryManager : MonoBehaviour
         
     }
 
-    public void NextDialogue ()
+    public void NextIntroDialogue ()
     {
         if (shouldNotAdvance)
             return;
@@ -89,11 +89,49 @@ public class StoryManager : MonoBehaviour
                 dialogueCanvas.SetActive(false);//Close dialogue box
                 GameManager.instance.LoadScene(1);//Load first level
                 GameManager.instance.SetGameState(GameManager.GameState.gameAlive);
+                //Reset index
+                dialogueIndex = -1;
                 break;
         }
         StartCoroutine(StoryCooldown(cooldownDuration));
     }
 
+    public void NextDeathDialogue()
+    {
+        if (shouldNotAdvance)
+            return;
+        dialogueIndex++;
+        dialogueCanvas.SetActive(true);
+        dialogueTMP.text = "";
+        float cooldownDuration = 1.5f;
+        continueText.SetActive(false);
+        switch (dialogueIndex)
+        {
+            case 0:
+                dialogueTMP.DOText("Oh my!", 1f).SetEase(Ease.InSine);
+                break;
+            case 1:
+                dialogueTMP.DOText("I should avoid touching the souls before weakening them!", 1f).SetEase(Ease.InSine);
+                break;
+            case 2:
+                dialogueTMP.DOText("I can cast magic with SPACEBAR. That should do the trick", 1f).SetEase(Ease.InSine);
+                FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(2);// Zoom into crystal ball
+                ShowTinyRoom();
+                cooldownDuration = 2.5f;
+                break;
+            case 3:
+                dialogueTMP.DOText("Ready or not, Kitty-souls, I'm coming for you!", 1f).SetEase(Ease.InSine);
+                break;
+            default:
+                dialogueCanvas.SetActive(false);//Close dialogue box
+                GameManager.instance.LoadScene(1);//Load first level
+                GameManager.instance.SetGameState(GameManager.GameState.gameAlive);
+                //Reset index
+                dialogueIndex = -1;
+                break;
+        }
+        StartCoroutine(StoryCooldown(cooldownDuration));
+    }
     private void ShowTinyRoom ()
     {
         tinyRoom.SetActive(true);

@@ -20,9 +20,10 @@ public class GameManager : MonoBehaviour
     {
         intro,
         menu,
-        home,
+        homeIntro,
         gameAlive,
-        gameDead
+        gameDead,
+        homeDead
     }
 
     private void Awake()
@@ -56,19 +57,21 @@ public class GameManager : MonoBehaviour
                     titleImage.DOFade(0f, 2f).SetEase(Ease.InOutSine).OnComplete(() =>
                    {
                        StoryManager.instance.shouldNotAdvance = false;
-                       StoryManager.instance.NextDialogue();
+                       StoryManager.instance.NextIntroDialogue();
                    });
                     FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(1);// Show witch
-                    SetGameState(GameState.home);
+                    SetGameState(GameState.homeIntro);
                     StoryManager.instance.titleContinue.SetActive(false);
                 }
                 break;
-            case GameState.home:
+            case GameState.homeIntro:
                 UpdateIntroDialogue();
                 break;
             case GameState.gameAlive:
                 break;
             case GameState.gameDead:
+                break;
+            case GameState.homeDead:
                 break;
             default:
                 Debug.LogError(curGameState + " not handled!");
@@ -79,6 +82,7 @@ public class GameManager : MonoBehaviour
     private IEnumerator DoIntroTimeout ()
     {
         FadeIn(10);
+        SetGameState(GameState.intro);
         titleImage.gameObject.SetActive(true);
         yield return new WaitForSeconds(10f);
         StoryManager.instance.titleContinue.SetActive(true);
@@ -89,14 +93,14 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            StoryManager.instance.NextDialogue();
+            StoryManager.instance.NextIntroDialogue();
         }
     }
 
-    private IEnumerator FadedSceneLoad (int sceneToLoad)
+    private IEnumerator FadedSceneLoad (int sceneToLoad, float fadeLength)
     {
-        FadeOut(3f);
-        yield return new WaitForSeconds(3f);
+        FadeOut(fadeLength);
+        yield return new WaitForSeconds(fadeLength);
         SceneManager.LoadScene(sceneToLoad);
     }
 
@@ -111,9 +115,9 @@ public class GameManager : MonoBehaviour
         screenFader.DOFade(1f, fadeTime).SetEase(Ease.InOutSine);
     }
 
-    public void LoadScene (int sceneToLoad)
+    public void LoadScene (int sceneToLoad, float fadeDuration = 3f)
     {
-        StartCoroutine(FadedSceneLoad(sceneToLoad));
+        StartCoroutine(FadedSceneLoad(sceneToLoad, fadeDuration));
     }
 
     public GameState GetGameState ()
@@ -123,7 +127,31 @@ public class GameManager : MonoBehaviour
 
     public void SetGameState(GameState newGameState)
     {
+        switch (newGameState)
+        {
+            case GameState.intro:
+                FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(0);// Intro credits
+                break;
+            case GameState.menu:
+                break;
+            case GameState.homeIntro:
+                break;
+            case GameState.gameAlive:
+                break;
+            case GameState.gameDead:
+                break;
+            case GameState.homeDead:
+                FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(1);// Show witch
+                break;
+        }
         curGameState = newGameState;
+    }
+
+    public void PlayerDied ()
+    {
+        AudioManager.instance.PlayPlayerKilled();
+        SetGameState(GameState.gameDead);
+        LoadScene(0, 0.5f);
     }
 
     public void DefeatedGhost ()
@@ -133,9 +161,10 @@ public class GameManager : MonoBehaviour
 
     private void OnLevelWasLoaded(int level)
     {
-        if (curGameState != GameState.home)
+        if (curGameState != GameState.homeIntro)
             StoryManager.instance.CloseDialogue();
-        Debug.Log("Fading in");
+        if (curGameState == GameState.gameDead)
+            SetGameState(GameState.homeDead);
         FadeIn();
     }
 }

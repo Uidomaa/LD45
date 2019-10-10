@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     public Transform magicPrefab;
     public Animator playerAnim;
 
+    private int numCapturedCatGhosts = 0;
     private Rigidbody rb;
     private float x;
     private float z;

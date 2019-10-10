@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     private Image screenFader;
     public Image titleImage;
 
-    private int numCats = 0;
+    private int numCatsCollected = 0;
 
     private GameState curGameState = GameState.intro;
     public enum GameState
@@ -145,6 +145,11 @@ public class GameManager : MonoBehaviour
                 break;
         }
         curGameState = newGameState;
+    }
+
+    public int GetCatsCollected ()
+    {
+        return numCatsCollected;
     }
 
     public void PlayerDied ()

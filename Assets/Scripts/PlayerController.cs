@@ -12,6 +12,9 @@ public class PlayerController : MonoBehaviour
     public Transform wandTip;
     public Transform magicPrefab;
     public Animator playerAnim;
+    [Header("CAT GHOSTS")]
+    public GameObject[] catGhosts;
+    public ParticleSystem catGhostPS;
 
     private int numCapturedCatGhosts = 0;
     private Rigidbody rb;
@@ -24,6 +27,8 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        foreach (var catGhost in catGhosts)
+            catGhost.SetActive(false);
     }
 
     // Update is called once per frame
@@ -84,7 +89,16 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public void CastMagic ()
     {
-        Instantiate(magicPrefab, wandTip.position, transform.rotation);
+        Transform magicSpell = Instantiate(magicPrefab, wandTip.position, transform.rotation);
+        magicSpell.GetComponent<SpellController>().AssignPlayer(this);
+    }
+
+    public void CollectedCatGhost ()
+    {
+        numCapturedCatGhosts++;
+        catGhosts[numCapturedCatGhosts - 1].SetActive(true);
+        catGhostPS.transform.position = catGhosts[numCapturedCatGhosts - 1].transform.position;
+        catGhostPS.Play();
     }
 
     private void OnCollisionEnter(Collision collision)

@@ -82,7 +82,7 @@ public class StoryManager : MonoBehaviour
             default:
                 dialogueCanvas.SetActive(false);//Close dialogue box
                 GameManager.instance.LoadScene(1);//Load first level
-                GameManager.instance.SetGameState(GameManager.GameState.gameAlive);
+                GameManager.instance.SetGameState(GameManager.GameState.gameStarting);
                 //Reset index
                 dialogueIndex = -1;
                 break;
@@ -90,6 +90,7 @@ public class StoryManager : MonoBehaviour
         StartCoroutine(StoryCooldown(cooldownDuration));
     }
 
+    //Dialogue when player comes back afer dying
     public void NextDeathDialogue()
     {
         if (shouldNotAdvance)
@@ -119,13 +120,68 @@ public class StoryManager : MonoBehaviour
             default:
                 dialogueCanvas.SetActive(false);//Close dialogue box
                 GameManager.instance.LoadScene(1);//Load first level
-                GameManager.instance.SetGameState(GameManager.GameState.gameAlive);
+                GameManager.instance.SetGameState(GameManager.GameState.gameStarting);
                 //Reset index
                 dialogueIndex = -1;
                 break;
         }
         StartCoroutine(StoryCooldown(cooldownDuration));
     }
+
+    //Dialogue after player comes back with souls
+    public void NextSuccessDialogue()
+    {
+        if (shouldNotAdvance)
+            return;
+        dialogueIndex++;
+        dialogueCanvas.SetActive(true);
+        dialogueTMP.text = "";
+        float cooldownDuration = 1.5f;
+        continueText.SetActive(false);
+        switch (dialogueIndex)
+        {
+            case 0:
+                dialogueTMP.DOText("I've collected " + GameManager.instance.GetCatSoulsCollected() + "!", 1f).SetEase(Ease.InSine);
+                break;
+            case 1:
+                dialogueTMP.DOText("Only " + (9 - GameManager.instance.GetCatSoulsCollected()) + " left!", 1f).SetEase(Ease.InSine);
+                break;
+            case 2:
+                dialogueTMP.DOText("Now off to the next house to find some more!", 1f).SetEase(Ease.InSine);
+                FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(2);// Zoom into crystal ball
+                ShowTinyRoom();
+                cooldownDuration = 2.5f;
+                break;
+            case 3:
+                dialogueTMP.DOText("Ready or not, Kitty-souls, I'm coming for you!", 1f).SetEase(Ease.InSine);
+                break;
+            default:
+                dialogueCanvas.SetActive(false);//Close dialogue box
+                GameManager.instance.LoadScene(1);//Load first level
+                GameManager.instance.SetGameState(GameManager.GameState.gameStarting);
+                //Reset index
+                dialogueIndex = -1;
+                break;
+        }
+        StartCoroutine(StoryCooldown(cooldownDuration));
+    }
+
+    /// <summary>
+    /// Dialogue once player has collected all souls
+    /// </summary>
+    public void NextWinDialogue ()
+    {
+
+    }
+
+    //Dialogue when player has collected all the souls in a level
+    public void CollectedGhostsDialogue()
+    {
+        dialogueCanvas.SetActive(true);
+        dialogueTMP.text = "";
+        dialogueTMP.DOText("Yay! I've collected more cat souls!", 1f).SetEase(Ease.InSine);
+    }
+
     private void ShowTinyRoom ()
     {
         tinyRoom.SetActive(true);

@@ -11,13 +11,7 @@ public class CatTrophyController : MonoBehaviour
     {
         for (int i = 0; i < catTrophies.Length; i++)
         {
-            catTrophies[i].SetActive(i < GameManager.instance.GetCatsCollected() ? true : false);
+            catTrophies[i].SetActive(i < GameManager.instance.GetCatSoulsCollected() ? true : false);
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

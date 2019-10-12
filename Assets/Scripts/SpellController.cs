@@ -9,6 +9,7 @@ public class SpellController : MonoBehaviour
 
     private ParticleSystem[] pses;
     private Rigidbody rb;
+    private PlayerController player;
 
     private void Awake()
     {
@@ -26,6 +27,11 @@ public class SpellController : MonoBehaviour
         rb.velocity = transform.forward * Time.fixedDeltaTime * moveSpeed;
     }
 
+    public void AssignPlayer(PlayerController _player)
+    {
+        player = _player;
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         AudioManager.instance.PlaySpellMiss();
@@ -36,7 +42,7 @@ public class SpellController : MonoBehaviour
             if (collision.gameObject.GetComponent<GhostController>())
             {
                 if (collision.gameObject.GetComponent<GhostController>().HitByPlayer()) { 
-                    GameManager.instance.DefeatedGhost();}
+                    GameManager.instance.DefeatedGhost(player);}
             }
             else
                 Debug.LogError("Ghost missing GhostController!");

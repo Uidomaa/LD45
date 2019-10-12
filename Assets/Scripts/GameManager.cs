@@ -21,8 +21,10 @@ public class GameManager : MonoBehaviour
         intro,
         menu,
         homeIntro,
+        gameStarting,
         gameAlive,
         gameDead,
+        homeAlive,
         homeDead
     }
 
@@ -71,6 +73,9 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.gameDead:
                 break;
+            case GameState.homeAlive:
+                UpdateSuccessDialogue();
+                break;
             case GameState.homeDead:
                 break;
             default:
@@ -94,6 +99,14 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             StoryManager.instance.NextIntroDialogue();
+        }
+    }
+
+    private void UpdateSuccessDialogue()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            StoryManager.instance.NextSuccessDialogue();
         }
     }
 
@@ -125,6 +138,11 @@ public class GameManager : MonoBehaviour
         return curGameState;
     }
 
+    public int GetCatSoulsCollected ()
+    {
+        return numCatsCollected;
+    }
+
     public void SetGameState(GameState newGameState)
     {
         switch (newGameState)
@@ -136,20 +154,20 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.homeIntro:
                 break;
+            case GameState.gameStarting:
+                break;
             case GameState.gameAlive:
                 break;
             case GameState.gameDead:
+                break;
+            case GameState.homeAlive:
+                StoryManager.instance.NextSuccessDialogue();
                 break;
             case GameState.homeDead:
                 FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(1);// Show witch
                 break;
         }
         curGameState = newGameState;
-    }
-
-    public int GetCatsCollected ()
-    {
-        return numCatsCollected;
     }
 
     public void PlayerDied ()
@@ -159,17 +177,31 @@ public class GameManager : MonoBehaviour
         LoadScene(0, 0.5f);
     }
 
-    public void DefeatedGhost ()
+    public void DefeatedGhost (PlayerController player)
     {
-        Debug.Log("HIT!");
+        numCatsCollected++;
+        player.CollectedCatGhost();
+        StoryManager.instance.CollectedGhostsDialogue();
+        FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(1);// Zoom in on witch
+        LoadScene(0, 5f);
     }
 
     private void OnLevelWasLoaded(int level)
     {
         if (curGameState != GameState.homeIntro)
             StoryManager.instance.CloseDialogue();
-        if (curGameState == GameState.gameDead)
-            SetGameState(GameState.homeDead);
+        switch (curGameState)
+        {
+            case GameState.gameStarting:
+                SetGameState(GameState.gameAlive);
+                break;
+            case GameState.gameDead:
+                SetGameState(GameState.homeDead);
+                break;
+            case GameState.gameAlive:
+                SetGameState(GameState.homeAlive);
+                break;
+        }
         FadeIn();
     }
 }

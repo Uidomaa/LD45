@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
 
     [SerializeField]
+    private RoomScriptableObject roomData;
+    [SerializeField]
     private Image screenFader;
     public Image titleImage;
 
@@ -78,6 +80,8 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.homeDead:
                 break;
+            case GameState.gameStarting:
+                break;
             default:
                 Debug.LogError(curGameState + " not handled!");
                 break;
@@ -117,6 +121,13 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(sceneToLoad);
     }
 
+    private IEnumerator FadedLevelLoad(float fadeLength)
+    {
+        FadeOut(fadeLength);
+        yield return new WaitForSeconds(fadeLength);
+        SceneManager.LoadScene(roomData.roomNames[roomData.currentRoom]);
+    }
+
     private void FadeIn (float fadeTime = 3f)
     {
         screenFader.color = Color.black;
@@ -131,6 +142,11 @@ public class GameManager : MonoBehaviour
     public void LoadScene (int sceneToLoad, float fadeDuration = 3f)
     {
         StartCoroutine(FadedSceneLoad(sceneToLoad, fadeDuration));
+    }
+
+    public void LoadLevel (float fadeDuration = 3f)
+    {
+        StartCoroutine(FadedLevelLoad(fadeDuration));
     }
 
     public GameState GetGameState ()
@@ -148,7 +164,9 @@ public class GameManager : MonoBehaviour
         switch (newGameState)
         {
             case GameState.intro:
+                roomData.currentRoom = 0;
                 FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(0);// Intro credits
+                StoryManager.instance.shouldNotAdvance = true;
                 break;
             case GameState.menu:
                 break;
@@ -179,8 +197,11 @@ public class GameManager : MonoBehaviour
 
     public void DefeatedGhost (PlayerController player)
     {
-        numCatsCollected++;
-        player.CollectedCatGhost();
+        //Tell player ghost was caught
+        if (player.CollectedCatGhost() < roomData.numGhostsInRoom[roomData.currentRoom])
+            return;
+        //End level if all ghosts caught
+        numCatsCollected += roomData.numGhostsInRoom[roomData.currentRoom];
         StoryManager.instance.CollectedGhostsDialogue();
         FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(1);// Zoom in on witch
         LoadScene(0, 5f);
@@ -188,17 +209,20 @@ public class GameManager : MonoBehaviour
 
     private void OnLevelWasLoaded(int level)
     {
-        if (curGameState != GameState.homeIntro)
-            StoryManager.instance.CloseDialogue();
         switch (curGameState)
         {
             case GameState.gameStarting:
+                //Loading level
+                StoryManager.instance.CloseDialogue();
                 SetGameState(GameState.gameAlive);
                 break;
             case GameState.gameDead:
+                //Failed level
                 SetGameState(GameState.homeDead);
                 break;
             case GameState.gameAlive:
+                //Beat level
+                roomData.currentRoom++;
                 SetGameState(GameState.homeAlive);
                 break;
         }

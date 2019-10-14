@@ -841,6 +841,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   screenFader: {fileID: 341697239}
   titleImage: {fileID: 1478694469}
+  roomData: {fileID: 11400000, guid: bc29d0fcfd1c8944da2f8198055c8206, type: 2}
 --- !u!114 &9036953270404678749
 MonoBehaviour:
   m_ObjectHideFlags: 0

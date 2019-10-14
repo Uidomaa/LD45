@@ -16,7 +16,7 @@ public class StoryManager : MonoBehaviour
     public GameObject tinyRoom;
 
     [HideInInspector]
-    public bool shouldNotAdvance = true;
+    public bool shouldNotAdvance = false;
 
     private void Awake()
     {
@@ -81,7 +81,7 @@ public class StoryManager : MonoBehaviour
                 break;
             default:
                 dialogueCanvas.SetActive(false);//Close dialogue box
-                GameManager.instance.LoadScene(1);//Load first level
+                GameManager.instance.LoadLevel();//Load first level
                 GameManager.instance.SetGameState(GameManager.GameState.gameStarting);
                 //Reset index
                 dialogueIndex = -1;
@@ -119,7 +119,7 @@ public class StoryManager : MonoBehaviour
                 break;
             default:
                 dialogueCanvas.SetActive(false);//Close dialogue box
-                GameManager.instance.LoadScene(1);//Load first level
+                GameManager.instance.LoadLevel();//Load same level
                 GameManager.instance.SetGameState(GameManager.GameState.gameStarting);
                 //Reset index
                 dialogueIndex = -1;
@@ -157,7 +157,7 @@ public class StoryManager : MonoBehaviour
                 break;
             default:
                 dialogueCanvas.SetActive(false);//Close dialogue box
-                GameManager.instance.LoadScene(1);//Load first level
+                GameManager.instance.LoadLevel();//Load next level
                 GameManager.instance.SetGameState(GameManager.GameState.gameStarting);
                 //Reset index
                 dialogueIndex = -1;

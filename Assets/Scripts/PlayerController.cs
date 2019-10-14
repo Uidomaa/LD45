@@ -93,12 +93,13 @@ public class PlayerController : MonoBehaviour
         magicSpell.GetComponent<SpellController>().AssignPlayer(this);
     }
 
-    public void CollectedCatGhost ()
+    public int CollectedCatGhost ()
     {
         numCapturedCatGhosts++;
         catGhosts[numCapturedCatGhosts - 1].SetActive(true);
         catGhostPS.transform.position = catGhosts[numCapturedCatGhosts - 1].transform.position;
         catGhostPS.Play();
+        return numCapturedCatGhosts;
     }
 
     private void OnCollisionEnter(Collision collision)

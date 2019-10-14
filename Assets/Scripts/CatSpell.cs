@@ -11,6 +11,7 @@ public class CatSpell : MonoBehaviour
     public Transform[] catGhosts;
     public GameObject cat;
     public ParticleSystem transformationPS;
+    public GameObject creditsCat;
 
     private void Awake()
     {
@@ -20,6 +21,7 @@ public class CatSpell : MonoBehaviour
     void Start()
     {
         cat.SetActive(false);
+        creditsCat.SetActive(false);
     }
 
 #if UNITY_EDITOR
@@ -50,5 +52,11 @@ public class CatSpell : MonoBehaviour
         foreach (var catGhost in catGhosts)
             catGhost.gameObject.SetActive(false);
         cat.SetActive(true);
+    }
+
+    public void ShowCreditsCat ()
+    {
+        cat.SetActive(false);
+        creditsCat.SetActive(true);
     }
 }

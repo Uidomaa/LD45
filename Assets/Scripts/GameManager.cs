@@ -26,7 +26,9 @@ public class GameManager : MonoBehaviour
         gameAlive,
         gameDead,
         homeAlive,
-        homeDead
+        homeDead,
+        homeWon,
+        homeEndCredits
     }
 
     private void Awake()
@@ -77,9 +79,15 @@ public class GameManager : MonoBehaviour
             case GameState.homeAlive:
                 UpdateSuccessDialogue();
                 break;
+            case GameState.homeWon:
+                UpdateWinDialogue();
+                break;
             case GameState.homeDead:
+                UpdateDeathDialogue();
                 break;
             case GameState.gameStarting:
+                break;
+            case GameState.homeEndCredits:
                 break;
             default:
                 Debug.LogError(curGameState + " not handled!");
@@ -105,11 +113,27 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void UpdateDeathDialogue()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            StoryManager.instance.NextDeathDialogue();
+        }
+    }
+
     private void UpdateSuccessDialogue()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
             StoryManager.instance.NextSuccessDialogue();
+        }
+    }
+
+    private void UpdateWinDialogue()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            StoryManager.instance.NextWinDialogue();
         }
     }
 
@@ -127,7 +151,7 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(roomData.roomNames[roomData.currentRoom]);
     }
 
-    private void FadeIn (float fadeTime = 3f)
+    public void FadeIn (float fadeTime = 3f)
     {
         screenFader.color = Color.black;
         screenFader.DOFade(0f, fadeTime).SetEase(Ease.InSine);
@@ -179,16 +203,19 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.homeAlive:
                 FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(1);// Show witch
-                if (numCatsCollected < 9)
-                    StoryManager.instance.NextSuccessDialogue();
-                else
-                {
-                    CrystalBallScript.instance.HideCrystalBall();
-                    StoryManager.instance.NextWinDialogue();
-                }
+                StoryManager.instance.NextSuccessDialogue();
                 break;
             case GameState.homeDead:
                 FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(1);// Show witch
+                StoryManager.instance.NextDeathDialogue();
+                break;
+            case GameState.homeWon:
+                FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(1);// Show witch
+                CrystalBallScript.instance.HideCrystalBall();
+                StoryManager.instance.NextWinDialogue();
+                break;
+            case GameState.homeEndCredits:
+                titleImage.DOFade(1f, 2f).SetEase(Ease.InSine);
                 break;
         }
         curGameState = newGameState;
@@ -229,7 +256,14 @@ public class GameManager : MonoBehaviour
             case GameState.gameAlive:
                 //Beat level
                 roomData.currentRoom++;
-                SetGameState(GameState.homeAlive);
+                if (numCatsCollected < 9)
+                {
+                    SetGameState(GameState.homeAlive);
+                }
+                else
+                {
+                    SetGameState(GameState.homeWon);
+                }
                 break;
         }
         FadeIn();

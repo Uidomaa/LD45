@@ -36,6 +36,18 @@ public class StoryManager : MonoBehaviour
         titleContinue.SetActive(false);
     }
 
+#if UNITY_EDITOR
+    private void Update()
+    {
+        //DEBUG
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            dialogueIndex = -1;
+            GameManager.instance.SetGameState(GameManager.GameState.homeWon);
+        }
+    }
+#endif
+
     public void NextIntroDialogue ()
     {
         if (shouldNotAdvance)
@@ -79,6 +91,7 @@ public class StoryManager : MonoBehaviour
                 break;
             default:
                 dialogueCanvas.SetActive(false);//Close dialogue box
+                continueText.SetActive(false);
                 GameManager.instance.LoadLevel();//Load first level
                 GameManager.instance.SetGameState(GameManager.GameState.gameStarting);
                 //Reset index
@@ -107,7 +120,7 @@ public class StoryManager : MonoBehaviour
                 dialogueTMP.DOText("I should avoid touching the souls before weakening them!", 1f).SetEase(Ease.InSine);
                 break;
             case 2:
-                dialogueTMP.DOText("I can cast magic with SPACEBAR. That should do the trick", 1f).SetEase(Ease.InSine);
+                dialogueTMP.DOText("I can cast magic with SPACEBAR. That should do the trick.", 1f).SetEase(Ease.InSine);
                 FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(2);// Zoom into crystal ball
                 ShowTinyRoom();
                 cooldownDuration = 2.5f;
@@ -117,6 +130,7 @@ public class StoryManager : MonoBehaviour
                 break;
             default:
                 dialogueCanvas.SetActive(false);//Close dialogue box
+                continueText.SetActive(false);
                 GameManager.instance.LoadLevel();//Load same level
                 GameManager.instance.SetGameState(GameManager.GameState.gameStarting);
                 //Reset index
@@ -136,25 +150,28 @@ public class StoryManager : MonoBehaviour
         dialogueTMP.text = "";
         float cooldownDuration = 1.5f;
         continueText.SetActive(false);
+        string numCollectedSes = GameManager.instance.GetCatSoulsCollected() == 1 ? "" : "s";
+        string numNextSes = GameManager.instance.roomData.numGhostsInRoom[GameManager.instance.roomData.currentRoom] == 1 ? "" : "s";
         switch (dialogueIndex)
         {
             case 0:
-                dialogueTMP.DOText("I've collected " + GameManager.instance.GetCatSoulsCollected() + " souls!", 1f).SetEase(Ease.InSine);
+                dialogueTMP.DOText("I've collected " + GameManager.instance.GetCatSoulsCollected() + " soul" + numCollectedSes + "!", 1f).SetEase(Ease.InSine);
                 break;
             case 1:
                 dialogueTMP.DOText("Only " + (9 - GameManager.instance.GetCatSoulsCollected()) + " left to go!", 1f).SetEase(Ease.InSine);
                 break;
             case 2:
-                dialogueTMP.DOText("Looks like the next house has " + GameManager.instance.roomData.numGhostsInRoom[GameManager.instance.roomData.currentRoom] + " more souls!", 1f).SetEase(Ease.InSine);
+                dialogueTMP.DOText("Looks like the next house has " + GameManager.instance.roomData.numGhostsInRoom[GameManager.instance.roomData.currentRoom] + " cat soul" + numNextSes + "!", 1f).SetEase(Ease.InSine);
                 FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(2);// Zoom into crystal ball
                 ShowTinyRoom();
                 cooldownDuration = 2.5f;
                 break;
             case 3:
-                dialogueTMP.DOText("Ready or not, Kitty-souls, I'm coming for you!", 1f).SetEase(Ease.InSine);
+                dialogueTMP.DOText("Ready or not, Kitty-soul" + numNextSes + ", I'm coming for you!", 1f).SetEase(Ease.InSine);
                 break;
             default:
                 dialogueCanvas.SetActive(false);//Close dialogue box
+                continueText.SetActive(false);
                 GameManager.instance.LoadLevel();//Load next level
                 GameManager.instance.SetGameState(GameManager.GameState.gameStarting);
                 //Reset index
@@ -185,18 +202,24 @@ public class StoryManager : MonoBehaviour
                 dialogueTMP.DOText("Time to make them into a full cat!", 1f).SetEase(Ease.InSine);
                 break;
             case 2:
-                dialogueTMP.DOText("Looks like the next house has " + GameManager.instance.roomData.numGhostsInRoom[GameManager.instance.roomData.currentRoom] + " more souls!", 1f).SetEase(Ease.InSine);
-                FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(2);// Zoom into crystal ball
-                ShowTinyRoom();
-                cooldownDuration = 2.5f;
+                dialogueTMP.DOText("........!!", 5f).SetEase(Ease.InSine);
+                StartCoroutine(CatSpell.instance.DoCatSpell());
+                cooldownDuration = 5f;
                 break;
             case 3:
-                dialogueTMP.DOText("Ready or not, Kitty-souls, I'm coming for you!", 1f).SetEase(Ease.InSine);
+                dialogueTMP.DOText("It worked! A real cat!", 1f).SetEase(Ease.InSine);
+                break;
+            case 4:
+                dialogueTMP.DOText("Thanks so much for your help!", 1f).SetEase(Ease.InSine);
+                break;
+            case 5:
+                dialogueTMP.DOText("You were great! Maybe I'll see you again some time?", 1f).SetEase(Ease.InSine);
+                StartCoroutine(GoToEndCredits());
+                cooldownDuration = 6f;
                 break;
             default:
                 dialogueCanvas.SetActive(false);//Close dialogue box
-                GameManager.instance.LoadLevel();//Load next level
-                GameManager.instance.SetGameState(GameManager.GameState.gameStarting);
+                GameManager.instance.SetGameState(GameManager.GameState.homeEndCredits);
                 //Reset index
                 dialogueIndex = -1;
                 break;
@@ -210,11 +233,23 @@ public class StoryManager : MonoBehaviour
         dialogueCanvas.SetActive(true);
         dialogueTMP.text = "";
         dialogueTMP.DOText("Yay! I've collected more cat souls!", 1f).SetEase(Ease.InSine);
+        continueText.SetActive(false);
     }
 
     private void ShowTinyRoom ()
     {
         StartCoroutine(CrystalBallScript.instance.ShowTinyRoom());
+    }
+
+    private IEnumerator GoToEndCredits ()
+    {
+        GameManager.instance.FadeOut(1f);
+        yield return new WaitForSeconds(1f);
+        FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(0);// Credits
+        CatSpell.instance.ShowCreditsCat();
+        yield return new WaitForSeconds(3f);
+        GameManager.instance.FadeIn(2f);
+        yield return new WaitForSeconds(2f);
     }
 
     private IEnumerator StoryCooldown (float cooldownDuration = 1f)

@@ -13,8 +13,7 @@ public class StoryManager : MonoBehaviour
     public TextMeshProUGUI dialogueTMP;
     public GameObject continueText;
     public GameObject titleContinue;
-    public GameObject tinyRoom;
-
+    
     [HideInInspector]
     public bool shouldNotAdvance = false;
 
@@ -35,7 +34,6 @@ public class StoryManager : MonoBehaviour
         dialogueCanvas.SetActive(false);
         continueText.SetActive(false);
         titleContinue.SetActive(false);
-        tinyRoom.SetActive(false);
     }
 
     public void NextIntroDialogue ()
@@ -141,13 +139,13 @@ public class StoryManager : MonoBehaviour
         switch (dialogueIndex)
         {
             case 0:
-                dialogueTMP.DOText("I've collected " + GameManager.instance.GetCatSoulsCollected() + "!", 1f).SetEase(Ease.InSine);
+                dialogueTMP.DOText("I've collected " + GameManager.instance.GetCatSoulsCollected() + " souls!", 1f).SetEase(Ease.InSine);
                 break;
             case 1:
-                dialogueTMP.DOText("Only " + (9 - GameManager.instance.GetCatSoulsCollected()) + " left!", 1f).SetEase(Ease.InSine);
+                dialogueTMP.DOText("Only " + (9 - GameManager.instance.GetCatSoulsCollected()) + " left to go!", 1f).SetEase(Ease.InSine);
                 break;
             case 2:
-                dialogueTMP.DOText("Now off to the next house to find some more!", 1f).SetEase(Ease.InSine);
+                dialogueTMP.DOText("Looks like the next house has " + GameManager.instance.roomData.numGhostsInRoom[GameManager.instance.roomData.currentRoom] + " more souls!", 1f).SetEase(Ease.InSine);
                 FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(2);// Zoom into crystal ball
                 ShowTinyRoom();
                 cooldownDuration = 2.5f;
@@ -171,7 +169,39 @@ public class StoryManager : MonoBehaviour
     /// </summary>
     public void NextWinDialogue ()
     {
-
+        if (shouldNotAdvance)
+            return;
+        dialogueIndex++;
+        dialogueCanvas.SetActive(true);
+        dialogueTMP.text = "";
+        float cooldownDuration = 1.5f;
+        continueText.SetActive(false);
+        switch (dialogueIndex)
+        {
+            case 0:
+                dialogueTMP.DOText("I've finally collected all 9 souls!!", 1f).SetEase(Ease.InSine);
+                break;
+            case 1:
+                dialogueTMP.DOText("Time to make them into a full cat!", 1f).SetEase(Ease.InSine);
+                break;
+            case 2:
+                dialogueTMP.DOText("Looks like the next house has " + GameManager.instance.roomData.numGhostsInRoom[GameManager.instance.roomData.currentRoom] + " more souls!", 1f).SetEase(Ease.InSine);
+                FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(2);// Zoom into crystal ball
+                ShowTinyRoom();
+                cooldownDuration = 2.5f;
+                break;
+            case 3:
+                dialogueTMP.DOText("Ready or not, Kitty-souls, I'm coming for you!", 1f).SetEase(Ease.InSine);
+                break;
+            default:
+                dialogueCanvas.SetActive(false);//Close dialogue box
+                GameManager.instance.LoadLevel();//Load next level
+                GameManager.instance.SetGameState(GameManager.GameState.gameStarting);
+                //Reset index
+                dialogueIndex = -1;
+                break;
+        }
+        StartCoroutine(StoryCooldown(cooldownDuration));
     }
 
     //Dialogue when player has collected all the souls in a level
@@ -184,8 +214,7 @@ public class StoryManager : MonoBehaviour
 
     private void ShowTinyRoom ()
     {
-        tinyRoom.SetActive(true);
-        tinyRoom.transform.DOScale(0f, 1f).From().SetEase(Ease.OutBounce);
+        StartCoroutine(CrystalBallScript.instance.ShowTinyRoom());
     }
 
     private IEnumerator StoryCooldown (float cooldownDuration = 1f)

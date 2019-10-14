@@ -9,8 +9,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    [SerializeField]
-    private RoomScriptableObject roomData;
+    public RoomScriptableObject roomData;
     [SerializeField]
     private Image screenFader;
     public Image titleImage;
@@ -131,7 +130,7 @@ public class GameManager : MonoBehaviour
     private void FadeIn (float fadeTime = 3f)
     {
         screenFader.color = Color.black;
-        screenFader.DOFade(0f, fadeTime).SetEase(Ease.InOutSine);
+        screenFader.DOFade(0f, fadeTime).SetEase(Ease.InSine);
     }
 
     public void FadeOut (float fadeTime = 3f)
@@ -179,7 +178,14 @@ public class GameManager : MonoBehaviour
             case GameState.gameDead:
                 break;
             case GameState.homeAlive:
-                StoryManager.instance.NextSuccessDialogue();
+                FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(1);// Show witch
+                if (numCatsCollected < 9)
+                    StoryManager.instance.NextSuccessDialogue();
+                else
+                {
+                    CrystalBallScript.instance.HideCrystalBall();
+                    StoryManager.instance.NextWinDialogue();
+                }
                 break;
             case GameState.homeDead:
                 FindObjectOfType<VirtualCameraController>().SwitchToVirtualCam(1);// Show witch
